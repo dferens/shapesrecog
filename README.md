@@ -1,4 +1,9 @@
 # Shapes recognition
 
 ## Requirements:
-    * PyQt4
+
+  - PyQt4
+  - PyBrain
+
+## Running:
+  - python src/app.py
