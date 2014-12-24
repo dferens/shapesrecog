@@ -1,4 +1,5 @@
 import sys
+import threading
 import os.path
 from PyQt4 import QtGui, QtCore, uic
 
@@ -21,11 +22,28 @@ class MainWindow(QtGui.QMainWindow):
         super(MainWindow, self).__init__()
         ui_file = os.path.join(settings.RESOURCES_DIR, 'app.ui')
         uic.loadUi(ui_file, self)
-        self.__connect_signals()
+
+        self.btLoad.clicked.connect(self.on_load_click)
+        self.btSave.clicked.connect(self.on_save_click)
+        self.btSelectImage.clicked.connect(self.on_select_image_click)
+        self.btRunCrossValidation.clicked.connect(self.on_run_click)
+
+        self.cbxLayer.addItems(core.LAYERS.keys())
+
+        self.network = None
 
     @property
-    def hidden_neurons(self):
-        return self.spHiddenNeurons.value()
+    def layer_type(self):
+        return str(self.cbxLayer.currentText())
+
+    @layer_type.setter
+    def layer_type(self, value):
+        index = self.cbxLayer.findText(value)
+        self.cbxLayer.setCurrentIndex(index)
+
+    @property
+    def bias(self):
+        return self.cbBias.isChecked()
 
     @property
     def trainer(self):
@@ -34,40 +52,73 @@ class MainWindow(QtGui.QMainWindow):
         else:
             return 'rprop'
 
-    def __connect_signals(self):
-        self.btSelectImage.clicked.connect(self.on_select_image_click)
-        self.btCreate.clicked.connect(self.on_create_click)
-        self.btRelearn.clicked.connect(self.on_relearn_click)
-        self.btLoad.clicked.connect(self.on_load_click)
-        self.btSave.clicked.connect(self.on_save_click)
+    @property
+    def layer_neurons(self):
+        text = str(self.tbHiddenLayerNeurons.text()).strip()
+        layer_neurons = map(int, text.split())
+        return layer_neurons
+
+    @layer_neurons.setter
+    def layer_neurons(self, value):
+        text = ' '.join(value)
+        self.tbHiddenLayerNeurons.setText(text)
+
+    @property
+    def folds_count(self):
+        return self.sbFold.value()
+
+    @property
+    def network(self):
+        return self._network
+
+    @network.setter
+    def network(self, value):
+        self._network = value
+        network_avaliable =  value is not None
+        self.btSave.setEnabled(network_avaliable)
+        self.btSelectImage.setEnabled(network_avaliable)
+
+    def on_run_click(self):
+        self.pbCrossValidation.setValue(0)
+        self.lbCrossValidationCA.setText('computing...')
+        self.btRunCrossValidation.setEnabled(False)
+
+        def task():
+            accuracies = []
+            accuracy_gen = core.validate_network(
+                hidden_layer_neurons=self.layer_neurons,
+                layer=self.layer_type,
+                bias=self.bias,
+                folds_count=self.folds_count,
+                trainer_class=self.trainer
+            )
+            for step, (accuracy, network) in enumerate(accuracy_gen, start=1):
+                accuracies.append(accuracy)
+                self.pbCrossValidation.setValue(100.0 / self.folds_count * step)
+                self.network = network
+
+            average_accuracy = sum(accuracies) / len(accuracies) * 100
+            self.lbCrossValidationCA.setText('{0:.2f} %'.format(average_accuracy))
+            self.btRunCrossValidation.setEnabled(True)
+
+        threading.Thread(target=task).start()
 
     def on_select_image_click(self):
         file_path = QtGui.QFileDialog.getOpenFileName(self, 'Select image', filter='*.png')
-        self.lbSelectedImage.setPixmap(QtGui.QPixmap(file_path))
+        pixmap = QtGui.QPixmap(file_path)
+        preview_pixmap = pixmap.scaled(self.lbSelectedImage.size(), QtCore.Qt.KeepAspectRatio)
+        self.lbSelectedImage.setPixmap(preview_pixmap)
         predicted_class = core.classify(self.network, file_path)
         self.lbClass.setText(predicted_class)
-
-    def on_create_click(self):
-        self.network = core.create_network(self.hidden_neurons)
-
-    def on_relearn_click(self):
-        core.learn_network(self.network, trainer=self.trainer)
-        images_files = core.get_learn_dataset_images()
-        predicted_count = 0
-
-        for file_path in images_files:
-            true_class = core.get_true_image_class(file_path)
-
-            if true_class ==  core.classify(self.network, file_path):
-                predicted_count += 1
-
-        predicted_percents = float(predicted_count) / len(images_files) * 100
-        self.lbTrainCA.setText('{0:.2f} % ({1}/{2})'.format(
-            predicted_percents, predicted_count, len(images_files)
-        ))
+        pass
 
     def on_load_click(self):
         self.network = core.import_network(self.NETWORK_FILE)
+        hidden_layers = self.network.modulesSorted[1:-1]
+
+        if len(hidden_layers) > 0:
+            self.hidden_neurons = hidden_layers[0].indim
+            self.layer_type = core.get_layer_id(type(hidden_layers[0]))
 
     def on_save_click(self):
         core.export_network(self.network, self.NETWORK_FILE)

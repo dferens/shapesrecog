@@ -2,5 +2,5 @@
 *.DS_Store
 .idea/
 
-res/data/learn/*
-res/data/learn/!README.md
+res/data/*
+res/data/!README.md

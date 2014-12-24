@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>532</width>
-    <height>416</height>
+    <width>676</width>
+    <height>541</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,22 +26,55 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Hidden neurons count</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="spHiddenNeurons">
-               <property name="value">
-                <number>32</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QGroupBox" name="gbNetwork">
+             <property name="title">
+              <string>Network</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="tbHiddenLayerNeurons">
+                  <property name="text">
+                   <string>10</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Bias</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QCheckBox" name="cbBias">
+                  <property name="text">
+                   <string>Enabled</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="cbxLayer"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Hidden layers neurons</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Hidden layer type</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox_3">
@@ -56,6 +89,9 @@
                   <property name="text">
                    <string>Backprop</string>
                   </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item>
@@ -64,7 +100,7 @@
                    <string>RProp</string>
                   </property>
                   <property name="checked">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -76,36 +112,22 @@
            <item>
             <widget class="QGroupBox" name="gbActions">
              <property name="title">
-              <string>Actions</string>
+              <string>Import / export</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
                <layout class="QGridLayout" name="gridLayout_2">
-                <item row="1" column="0">
-                 <widget class="QPushButton" name="btLoad">
-                  <property name="text">
-                   <string>Load from file</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="1">
-                 <widget class="QPushButton" name="btRelearn">
+                 <widget class="QPushButton" name="btSave">
                   <property name="text">
-                   <string>Relearn</string>
+                   <string>Save to file</string>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="0">
-                 <widget class="QPushButton" name="btCreate">
+                 <widget class="QPushButton" name="btLoad">
                   <property name="text">
-                   <string>Create</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QPushButton" name="btSave">
-                  <property name="text">
-                   <string>Save to file</string>
+                   <string>Load from file</string>
                   </property>
                  </widget>
                 </item>
@@ -115,22 +137,69 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_4">
+            <widget class="QGroupBox" name="gbLearning">
              <property name="title">
-              <string>Info</string>
+              <string>Cross validation</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_3">
+              <item row="4" column="0" colspan="2">
+               <widget class="QGroupBox" name="groupBox_4">
+                <property name="title">
+                 <string>Results</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_5">
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_3">
+                     <property name="text">
+                      <string>CA</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLabel" name="lbCrossValidationCA">
+                     <property name="text">
+                      <string>TextLabel</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="2" column="0" colspan="2">
+               <widget class="QPushButton" name="btRunCrossValidation">
                 <property name="text">
-                 <string>CA on train data</string>
+                 <string>Run</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Number of folds</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLabel" name="lbTrainCA">
-                <property name="text">
-                 <string>none</string>
+               <widget class="QSpinBox" name="sbFold">
+                <property name="minimum">
+                 <number>2</number>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>3</number>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0" colspan="2">
+               <widget class="QProgressBar" name="pbCrossValidation">
+                <property name="value">
+                 <number>0</number>
                 </property>
                </widget>
               </item>
@@ -162,14 +231,14 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>64</width>
-                 <height>64</height>
+                 <width>256</width>
+                 <height>256</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>64</width>
-                 <height>64</height>
+                 <width>256</width>
+                 <height>256</height>
                 </size>
                </property>
                <property name="frameShape">
